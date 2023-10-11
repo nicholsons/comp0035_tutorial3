@@ -23,9 +23,14 @@ dependencies = [
     "openpyxl",
 ]
 
-# Refer to https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+# see https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+[tool.setuptools]
+include-package-data = true
+
+# see https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
 [tool.setuptools.packages.find]
-where = ["solutions","starter_code"]
+where = ["src"]
+include = ["starter_code","data"]
 namespaces = false
 
 [tool.setuptools.package-data]

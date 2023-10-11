@@ -41,3 +41,6 @@ if __name__ == '__main__':
     # Manually add the 'NOC' code for Great Britain (GBR) and Republic of Korea (KOR)
     # This is a little more tricky as you need to replace a value in one column based on a condition in another
     # There will be more than one way to do this, I used a mask (condition).
+
+    # Solution to problem 4: Print the unique values for the Type column
+    print("\nThe unique values for the Type column\n", prepared_df['Type'].unique())

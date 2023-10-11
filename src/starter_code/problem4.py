@@ -1,5 +1,4 @@
-# Problem 5: Identify and address missing values
-# Problem 4: Identify and address any missing values
+# Problem 4: Dealing with missing values
 from pathlib import Path
 
 import pandas as pd
@@ -54,9 +53,9 @@ def prepare_data(df):
         df_prepared: A pandas DataFrame with the prepared data
 
        """
-    # Drop the list of named columns `['Events', 'Sports', 'Countries'] and
-    # assign the result to a new variable named df_prepared
+    # Drop the list of named columns `['Events', 'Sports', 'Countries'] & assign to a new variable named df_prepared
     df_prepared = df.drop(['Events', 'Sports', 'Countries'], axis=1)
+
 
     # 1. Find and count the number of missing values e.g., Null `isnull().sum().sum()` or NaN `isna().sum().sum()`
     # and print the result
@@ -75,3 +74,15 @@ if __name__ == '__main__':
     raw_df = create_dataframe(raw_data_file)
     # print_df_information(raw_df)
     prepared_df = prepare_data(raw_df)
+
+    # Problem 5
+    # 1. Find the number of missing values in the DataFrame using .isna() or isnnull(). 'True' indicates a missing
+    # value.
+    # To count instead you can use `isnull().sum().sum()` or `isna().sum().sum()`
+    # print()  # add code inside the print
+    # Create a dataframe with only the rows that contain any missing values
+    missing_rows = prepared_df[prepared_df.isna().any(axis=1)]  # Add code here
+    print(missing_rows)
+
+
+

@@ -1,4 +1,4 @@
-# Problem 4: Find the unique values for categorical data
+# Problem 5: Dealing with inconsistent values for categorical data
 from pathlib import Path
 
 import pandas as pd
@@ -57,14 +57,9 @@ def prepare_data(df):
     # assign the result to a new variable named df_prepared
     df_prepared = df.drop(['Events', 'Sports', 'Countries'], axis=1)
 
-    # 1. Find and count the number of missing values e.g., Null `isnull().sum().sum()` or NaN `isna().sum().sum()`
-    # and print the result
 
-    # 2. Create a dataframe with the rows that contain missing values and print it
 
-    # 3. Drop rows where there is a na in the Participants M or F columns
 
-    # 4. Replace the NaN in Type column with 'Winter'
 
     return df_prepared
 
@@ -75,4 +70,5 @@ if __name__ == '__main__':
     # print_df_information(raw_df)
     prepared_df = prepare_data(raw_df)
 
-
+    # 1. Print the unique values for the Type column using `df['ColName'].unique()`
+    print("\nThe unique values for the Type column\n", prepared_df['Type'].unique())

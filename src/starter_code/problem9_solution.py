@@ -2,9 +2,10 @@
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
 def print_df_information(df):
@@ -35,12 +36,18 @@ def print_df_information(df):
 
 if __name__ == '__main__':
     prepared_data_file = Path(__file__).parent.parent.joinpath('data', 'paralympics_prepared.csv')
-    # Parse the dates to strings when the data is loaded to the DataFrame
+    # Parse the dates as a date in the format of Year when the data is loaded to the DataFrame
     prepared_df = pd.read_csv(prepared_data_file, parse_dates=['Start', 'End'], dtype={'Year': str})
 
     # 1. Create a box plot and show it
+    # prepared_df.plot.box()
+    # plt.show()
 
-    # 2. Modify the box plot to create separate plots for each variable using the argunent submplots=True
+    # 2. Modify the box plot to create separate plots for each variable using the argument `subplots=True`
+    # prepared_df.plot.box(subplots=True)
+    # plt.show()
 
     # 3. Save the image to file in the data directory
-
+    prepared_df.plot.box(subplots=True)
+    fig_file = Path(__file__).parent.parent.joinpath('data', 'boxplot_example.png')
+    plt.savefig(fig_file)

@@ -1,76 +1,100 @@
-'''
-Problem 7 Challenge
-
-The start and end date columns are text format and the date doesn't include the year.
-Year is a separate field.
-You need to combine the dd-mmm and the yyyy to create a date for the start and end columns.
-Once you have the two columns as dates, then add a new column called duration and calculate the
-days between the start and end dates.
-
-The functions you will need are covered in the 'How to ... data
-exploration' guide rather than the 'How to... data preparation' guide.
-'''
+# Problem 7: Compute new data
 from pathlib import Path
 
 import pandas as pd
 
 
-def prepare_data():
+def print_df_information(df):
+    """ Prints information that the describes the contents of the DataFrame.
+
+    Args:
+        df: A pandas dataframe containing the data
     """
-        Prepares the data and saves to file by addressing:
-            Problem 1: Reads the csv into a DataFrame and sets pandas display options to the number of rows and columns
-            Problem 3: Removes the Events', 'Sports', 'Countries' columns
-            Problem 4: Removes the rows with nulls in Participants columns; and replaces missing values in Type column
-            Problem 5: Removes the trailing spaces from the text entries in the Type column
-            Problem 6: Merges the NOC code column from the noc_csv and adds missing values
-        :return: None
-    """
-    # Problem 1. Load the data and set pandas display options to fit all rows and columns
-    paralympics_raw_csv = Path(__file__).parent.parent.joinpath('data', 'paralympics_raw.csv')
-    df = pd.read_csv(paralympics_raw_csv)
-    pd.set_option('display.max_rows', df.shape[0] + 1)
-    pd.set_option('display.max_columns', df.shape[1] + 1)
-    # Problem 3. Remove the Events', 'Sports', 'Countries' columns
-    df.drop(['Events', 'Sports', 'Countries'], axis=1, inplace=True)
-    # Problem 4: Removes the rows with nulls in Participants columns; and replaces missing values in Type column.
-    df.dropna(axis=0, subset=['Participants (M)', 'Participants (F)'], inplace=True)
-    df.fillna({'Type': 'Winter'}, inplace=True)
-    # Problem 5: Removes the trailing spaces from the text entries in the Type column
-    df['Type'] = df['Type'].str.strip()
-    # Problem 6: Merge the NOC code column from the noc_csv
-    # Open the noc_regions.csv in a dataframe
-    noc_csv = Path(__file__).parent.parent.joinpath('data', 'noc_regions.csv')
-    df_noc = pd.read_csv(noc_csv)
-    # Drop the 'notes' column
-    df_noc = df_noc.drop(['notes'], axis=1)
-    # Merge the columns where df['Country'] matches df_noc['region']
-    df_merged = df.merge(df_noc, how='left', left_on='Country', right_on='region')
+    print("\nNumber of rows and columns:\n")
+    print(df.shape)
+    print("\nFirst 7 rows:\n")
+    print(df.head(7))
+    print("\nLast 6 rows:\n")
+    print(df.tail(6))
+    print("\nColumn labels:\n")
+    print(df.columns)
+    print("\nColumn labels, datatypes and value counts:\n")
+    print(df.info())
+    print("\nColumn data types:\n")
+    print(df.dtypes)
+    print("\nGeneral Statistics:\n")
+    print(df.describe())
+    print("\nRows with nulls:\n")
+    nulls_df = df[df.isna().any(axis=1)]
+    print(nulls_df)
+    print("\nThe unique values for the Type column\n", df['Type'].unique())
+
+
+def prepare_data(df, df2):
+    """ Takes the raw data and prepares it for later use in the paralympics dashboard
+
+        TODO: The arguments could be given more meaningful names than df, df2...
+
+       Args:
+           df: The raw paralympics data in a pandas DataFrame
+           df2: The NOC code data in a pandas DataFrame
+
+       Returns:
+        df_prepared: A pandas DataFrame with the prepared data
+
+       """
+    # Drop the list of named columns `['Events', 'Sports', 'Countries']
+    df_dropcols = df.drop(['Events', 'Sports', 'Countries'], axis=1)
+    # Drop rows where there is NaN in the 'Participants M' or 'Participants F' columns
+    df_dropnans = df_dropcols.dropna(subset=['Participants (M)', 'Participants (F)'])
+    # Replace the NaN in Type column with 'Winter'
+    df_fillnans = df_dropnans.fillna({'Type': 'Winter'})
+    # Remove the whitespace from the Type values using `str.strip()`
+    df_fillnans['Type'] = df_fillnans['Type'].str.strip()
+    # Create the merged dataframe
+    df_merged = df_fillnans.merge(df2, how='left', left_on='Country', right_on='region')
     df_merged = df_merged.drop(['region'], axis=1)
-    # Manually add the 'NOC' code for Great Britain (GBR) and Republic of Korea (KOR)
-    # You need to replace a value in one column based on a condition in another.
-    # There will be more than one way to do this, the following uses a mask (condition).
     df_merged['NOC'] = df_merged['NOC'].mask(df_merged['Country'] == 'Great Britain', 'GBR')
     df_merged['NOC'] = df_merged['NOC'].mask(df_merged['Country'] == 'Republic of Korea', 'KOR')
-    return df_merged
+
+    # 3. Add the year to the Start and End columns to create a full date as a string.
+    # Year is int and Start/End are strings. To combine these as a string, convert the Year to string.
+    # TODO: Consider if there is a case where the dates span year end e.g. December to January)
+    df_merged["Start"] = + df_merged["Start"] + '-' + df_merged["Year"].astype(str)
+        # Add code to make df_merged["End"] a string format date
+
+    # 4. Change the datatype for Start and End from string to date-time format.
+    # Pandas to_datetime handles most date formats so the following should work without using the `format=` argument.
+    # 'Start' is given below.
+    df_merged['Start'] = pd.to_datetime(df_merged['Start'], format='%d-%b-%Y')
+    # df_merged['Start'] = pd.to_datetime(df_merged['Start'])  # This should also work
+         # Add the code change the datatype for 'End' from string to date-time format.
+
+    df_merged['Start'] = pd.to_datetime(df_merged['Start'], format='%d-%b-%Y')
+    # df['Start'] = pd.to_datetime(df['Start'])  # Should also work without `format=`
+
+    # 5. Add a duration column to the DataFrame that is the difference in days between the
+    # start and end dates. The datatype should be integer.
+
+    # The output of the above is in timedelta format, this may not suit your needs
+    # Change the data type of df_merged['Duration'] to int using .dt.days
+
+    df_prepared = df_merged
+    return df_prepared
 
 
 if __name__ == '__main__':
-    df_raw = prepare_data()
+    raw_data_events = Path(__file__).parent.parent.joinpath('data', 'paralympics_raw.csv')
+    events_df = pd.read_csv(raw_data_events)
+    pd.set_option('display.max_rows', events_df.shape[0] + 1)
+    pd.set_option('display.max_columns', events_df.shape[1] + 1)
+    raw_data_noc = Path(__file__).parent.parent.joinpath('data', 'noc_regions.csv')
+    cols = ['NOC', 'region']
+    noc_df = pd.read_csv(raw_data_noc, usecols=cols)
+    merged_df = prepare_data(df=events_df, df2=noc_df)
 
-    # Check the data type of the columns
+    # 1. Print the data types of the ['Year', 'Start', 'End'] columns
 
-    # Check the format of the strings in Start and End by printing a couple of rows
+    # 2. Check the format of the values in  `['Year', 'Start', 'End']` by printing a couple of rows
 
-    # Add the year to the Start and End columns. Year is int and Start/End are strings so to combine as strings you
-    # need to first convert the Year to string
-
-    # Change the Start/End columns datatype to datetime format
-    # Pandas to_datetime handles most date formats so you can use it without the format= and it will work
-
-    # Create a duration column that calculates days between the start and end
-
-    # The output of the above is in timedelta format, however we want to compare duration as int
-    # Convert the format from datetime to int
-
-
-
+    # After completing step 3, run the code for 1 and 2 again to check the datatypes and values of Start and End

@@ -51,8 +51,6 @@ def print_df_information(df):
     print("\nStatistics:\n")
     print(df.describe())  # Add your code inside the brackets
 
-    # Print the unique values for the Type column
-
 
 def prepare_data(df):
     """ Takes the raw data and prepares it for later use in the paralympics dashboard
@@ -66,7 +64,7 @@ def prepare_data(df):
        """
     # 1. Drop the list of named columns `['Events', 'Sports', 'Countries'] and
     # assign the result to a new variable named df_prepared
-
+    df_prepared = ''  # Add code and delete the ''
     return df_prepared
 
 
@@ -77,6 +75,5 @@ if __name__ == '__main__':
 
     # Code to run problem 3 solution
     print("\nColumns before deletion:\n", raw_df.columns)
-    prepared_df = prepare_data(raw_df)
-    # Print the column labels again, or check the shape which should be lower than the original column count
-    print("\nColumns after deletion:\n", prepared_df.columns)
+    dropped_cols_df = prepare_data(raw_df)
+    print("\nColumns after deletion:\n", dropped_cols_df.columns)

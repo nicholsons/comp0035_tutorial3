@@ -52,10 +52,17 @@ def prepare_data(df, df2):
     # Remove the whitespace from the Type values using `str.strip()`
     df_fillnans['Type'] = df_fillnans['Type'].str.strip()
 
-    # 2. Merge the DataFrames using a left merge. See the tutorial instructions for details.
-    df_merged = ''
+    # 2. Merge the DataFrames using a left merge.
+    df_merged = df_fillnans.merge(df2, how='left', left_on='Country', right_on='region')
 
-    # 3. Drop either the Country or region column (see problem 3)
+    # 3. Drop either the Country or region column
+    df_merged = df_merged.drop(['region'], axis=1)
+
+    # 7. Manually add the 'NOC' code for Great Britain (GBR) and Republic of Korea (KOR)
+    #  Replace a value in one column based on a condition in another.
+    #  This is not the only solution. It uses a mask (condition).
+    df_merged['NOC'] = df_merged['NOC'].mask(df_merged['Country'] == 'Great Britain', 'GBR')
+    df_merged['NOC'] = df_merged['NOC'].mask(df_merged['Country'] == 'Republic of Korea', 'KOR')
 
     df_prepared = df_merged
 
@@ -72,8 +79,19 @@ if __name__ == '__main__':
     # Hint: Path(__file__).parent.parent.joinpath('data', 'noc_regions.csv') to reference the file
     # Hint: Use the `usecols=['Col','Col2']` attribute in `pd.read_csv`
 
+    raw_data_noc = Path(__file__).parent.parent.joinpath('data', 'noc_regions.csv')
+    cols = ['NOC', 'region']
+    noc_df = pd.read_csv(raw_data_noc, usecols=cols)
+
     # 4. Create the merged dataframe by passing df (events_df) and df2 (noc_df) to `prepare_data(df, f1)`
+    merged_df = prepare_data(df=events_df, df2=noc_df)
+    print(merged_df.head(5))
 
     # 5. Print any rows in the merged DataFrame that have NaNs
+    nulls_df = merged_df[merged_df.isna().any(axis=1)]
+    print("\nRows with nulls:\n", nulls_df)
 
     # 6. Print all rows of the NOC DataFrame
+    with pd.option_context('display.max_rows', None, ):
+        print(noc_df)
+

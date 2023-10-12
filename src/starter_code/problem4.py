@@ -56,15 +56,14 @@ def prepare_data(df):
     # Drop the list of named columns `['Events', 'Sports', 'Countries'] & assign to a new variable named df_prepared
     df_prepared = df.drop(['Events', 'Sports', 'Countries'], axis=1)
 
+    # 3.1 Drop rows where there is NaN in the 'Participants M' or 'Participants F' columns
+    # Use `dropna` and specify to only remove  with null/Nan in the Participants (M) and Participants (F) columns
+    # The general syntax is: df.dropna(subset=['AColName', 'AnotherColName'])
+    # Remember: assign the result to a new DataFrame, or use the `inplace=True` attribute
 
-    # 1. Find and count the number of missing values e.g., Null `isnull().sum().sum()` or NaN `isna().sum().sum()`
-    # and print the result
-
-    # 2. Create a dataframe with the rows that contain missing values and print it
-
-    # 3. Drop rows where there is a na in the Participants M or F columns
-
-    # 4. Replace the NaN in Type column with 'Winter'
+    # 3.2 Replace the NaN in Type column with 'Winter'
+    # The general syntax is: df.fillna({'ColName': 'ValueToReplaceNull'})
+    # Remember: assign the result to a new DataFrame, or use the `inplace=True` attribute
 
     return df_prepared
 
@@ -73,16 +72,12 @@ if __name__ == '__main__':
     raw_data_file = Path(__file__).parent.parent.joinpath('data', 'paralympics_raw.csv')
     raw_df = create_dataframe(raw_data_file)
     # print_df_information(raw_df)
-    prepared_df = prepare_data(raw_df)
+    dropped_cols_df = prepare_data(raw_df)
 
-    # Problem 5
-    # 1. Find the number of missing values in the DataFrame using .isna() or isnnull(). 'True' indicates a missing
-    # value.
-    # To count instead you can use `isnull().sum().sum()` or `isna().sum().sum()`
-    # print()  # add code inside the print
-    # Create a dataframe with only the rows that contain any missing values
-    missing_rows = prepared_df[prepared_df.isna().any(axis=1)]  # Add code here
+    # Problem 4
+    # 1. Print the missing values in the DataFrame using .isna() or isnnull(). 'True' indicates a missing value.
+    print()  # add code inside the print
+
+    # 2. Create a dataframe named `missing_rows` with only the rows that contain any missing values
+    missing_rows = ''  # Add code here, delete the ''
     print(missing_rows)
-
-
-

@@ -1,10 +1,11 @@
-# Problem 9: Identifying outliers
+# Problem 10: Timeseries data
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
 def print_df_information(df):
@@ -35,12 +36,14 @@ def print_df_information(df):
 
 if __name__ == '__main__':
     prepared_data_file = Path(__file__).parent.parent.joinpath('data', 'paralympics_prepared.csv')
-    # Parse the dates to strings when the data is loaded to the DataFrame
+    # Parse the dates as a date in the format of Year when the data is loaded to the DataFrame
     prepared_df = pd.read_csv(prepared_data_file, parse_dates=['Start', 'End'], dtype={'Year': str})
 
-    # 1. Create a box plot and show it
+    # 1. Create a line chart using pd.DataFrame.plot
+    prepared_df.plot(x="Start", y="Participants")
+    plt.show()
 
-    # 2. Modify the box plot to create separate plots for each variable using the argunent submplots=True
-
-    # 3. Save the image to file in the data directory
+    # 2. Group the data by Type and display the chart
+    prepared_df.groupby("Type").plot(x="Year", y="Participants")
+    plt.show()
 

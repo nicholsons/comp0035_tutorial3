@@ -1,4 +1,4 @@
-# Problem 5: Dealing with inconsistent values for categorical data
+# Problem 5 Solutions: Dealing with inconsistent values for categorical data
 from pathlib import Path
 
 import pandas as pd
@@ -57,14 +57,13 @@ def prepare_data(df):
     # assign the result to a new variable named df_prepared
     df_prepared = df.drop(['Events', 'Sports', 'Countries'], axis=1)
     # Drop rows where there is NaN in the 'Participants M' or 'Participants F' columns
-    df_prepared.dropna(subset=['Participants (M)', 'Participants (F)'], inplace=True)
+    df_prepared.dropna(axis=0, subset=['Participants (M)', 'Participants (F)'], inplace=True)
     # Replace the NaN in Type column with 'Winter'
     df_prepared.fillna({'Type': 'Winter'}, inplace=True)
 
     # 2. Remove the whitespace from the Type values using `str.strip()`
     # General syntax: df['ColName'] = df['ColName'].str.strip()
     df_prepared['Type'] = df_prepared['Type'].str.strip()
-
 
     return df_prepared
 
@@ -75,16 +74,7 @@ if __name__ == '__main__':
     # print_df_information(raw_df)
     nulls_fixed_df = prepare_data(raw_df)
 
-    # Problem 4 solution
-    # NB: The solution won't run in this file as the issues have been addressed in prepare_data and the DataFrame on
-    # line 73 is renamed from dropped_cols_df to nulls_fixed_df
-    # Print the number of missing values in the DataFrame
-    # print(dropped_cols_df.isna())
-    # Create a dataframe with only the rows that contain any missing values
-    # missing_rows = dropped_cols_df[dropped_cols_df.isna().any(axis=1)]
-    # print("\nRows with nulls:\n", missing_rows)
+    # Problem 5 solution
+    # Print unique values for the 'Type' column
+    print("\nThe unique values for the Type column\n", nulls_fixed_df['Type'].unique())
 
-    # Problem 5 code
-    # Print the unique values for the Type column.
-    # The general syntax is: df['ColName'].unique()
-    print()

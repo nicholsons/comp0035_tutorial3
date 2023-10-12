@@ -1,4 +1,4 @@
-# Problem 6: Combining data sets
+# Problem 7: Compute new data
 from pathlib import Path
 
 import pandas as pd
@@ -51,11 +51,29 @@ def prepare_data(df, df2):
     df_fillnans = df_dropnans.fillna({'Type': 'Winter'})
     # Remove the whitespace from the Type values using `str.strip()`
     df_fillnans['Type'] = df_fillnans['Type'].str.strip()
+    # Create the merged dataframe
+    df_merged = df_fillnans.merge(df2, how='left', left_on='Country', right_on='region')
+    df_merged = df_merged.drop(['region'], axis=1)
+    df_merged['NOC'] = df_merged['NOC'].mask(df_merged['Country'] == 'Great Britain', 'GBR')
+    df_merged['NOC'] = df_merged['NOC'].mask(df_merged['Country'] == 'Republic of Korea', 'KOR')
 
-    # 2. Merge the DataFrames using a left merge. See the tutorial instructions for details.
-    df_merged = ''
+    # 3. Add the year to the Start and End columns to create a full date as a string.
+    # Year is int and Start/End are strings. To combine these as a string, convert the Year to string.
+    # TODO: Consider if there is a case where the dates span year end e.g. December to January)
+    df_merged["Start"] = df_merged["Start"] + '-' + df_merged["Year"].astype(str)
+    df_merged["End"] = df_merged["End"] + '-' + df_merged["Year"].astype(str)
 
-    # 3. Drop either the Country or region column (see problem 3)
+    # 4. Change the column datatype for Start and End from string to date-time format
+    # 'Start' is given to you:
+    df_merged['Start'] = pd.to_datetime(df_merged['Start'], format='%d-%b-%Y')
+    df_merged['End'] = pd.to_datetime(df_merged['End'], format='%d-%b-%Y')
+
+    # 5. Add a duration column to the DataFrame that is the difference in days between the
+    # start and end dates. The datatype should be integer.
+    df_merged['Duration'] = df_merged['End'] - df_merged['Start']
+    # The output of the above is in timedelta format, this may not suit your needs
+    # Change the data type of df_merged['Duration'] to int using .dt.days
+    df_merged['Duration'] = df_merged['Duration'].dt.days
 
     df_prepared = df_merged
 
@@ -67,13 +85,16 @@ if __name__ == '__main__':
     events_df = pd.read_csv(raw_data_events)
     pd.set_option('display.max_rows', events_df.shape[0] + 1)
     pd.set_option('display.max_columns', events_df.shape[1] + 1)
+    raw_data_noc = Path(__file__).parent.parent.joinpath('data', 'noc_regions.csv')
+    cols = ['NOC', 'region']
+    noc_df = pd.read_csv(raw_data_noc, usecols=cols)
+    merged_df = prepare_data(df=events_df, df2=noc_df)
 
-    # 1. Create a data frame with the 'NOC' and 'region' columns from 'data/noc_regions.csv'
-    # Hint: Path(__file__).parent.parent.joinpath('data', 'noc_regions.csv') to reference the file
-    # Hint: Use the `usecols=['Col','Col2']` attribute in `pd.read_csv`
+    # 1. Print the data types of the ['Year', 'Start', 'End'] columns
+    print(merged_df[['Year', 'Start', 'End']].dtypes)
 
-    # 4. Create the merged dataframe by passing df (events_df) and df2 (noc_df) to `prepare_data(df, f1)`
+    # 2. Check the format of the values in `['Year', 'Start', 'End']` by printing a couple of rows
+    print(merged_df[['Year', 'Start', 'End']].head(2))
 
-    # 5. Print any rows in the merged DataFrame that have NaNs
 
-    # 6. Print all rows of the NOC DataFrame
+

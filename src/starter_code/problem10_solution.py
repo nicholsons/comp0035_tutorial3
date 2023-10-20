@@ -40,10 +40,9 @@ if __name__ == '__main__':
     prepared_df = pd.read_csv(prepared_data_file, parse_dates=['Start', 'End'], dtype={'Year': str})
 
     # 1. Create a line chart using pd.DataFrame.plot
-    prepared_df.plot(x="Start", y="Participants")
-    plt.show()
+    #prepared_df.plot(x="Start", y="Participants")
+    #plt.show()
 
     # 2. Group the data by Type and display the chart
-    prepared_df.groupby("Type").plot(x="Year", y="Participants")
+    prepared_df.groupby("Type").plot(x="Start", y="Participants", xticks=prepared_df['Start'])
     plt.show()
-
